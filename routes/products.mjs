@@ -1,10 +1,13 @@
 import express from 'express'
+import Products from '../modals/products.mjs'
 
 const router=express.Router()
 
-router.get('/',(req,res)=>{
+router.get('/',async(req,res)=>{
     // start db operations
-    res.send({message:'Response receive successfully!',data:[]})
+    const getProducts = await Products.find()
+    console.log(getProducts)
+    res.send({message:'Products Fetched Successfully!',data:getProducts})
 })
 
 router.post('/add',(req,res)=>{
