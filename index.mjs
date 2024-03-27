@@ -11,4 +11,7 @@ app.listen(3001, () => {
 mongodb.connection.once('open',()=>{
     console.log('db connected successfully!')
 })
+
+app.use(express.json()) //Backend ko batana ka tumhari bodies ki type JSON hogi
+
 app.use('/',routes)

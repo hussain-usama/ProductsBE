@@ -6,13 +6,17 @@ const router=express.Router()
 router.get('/',async(req,res)=>{
     // start db operations
     const getProducts = await Products.find()
-    console.log(getProducts)
     res.send({message:'Products Fetched Successfully!',data:getProducts})
 })
 
-router.post('/add',(req,res)=>{
+router.post('/add',async(req,res)=>{
     // start db operations
-    res.send({message:'Record added successfully!'})
+    try {
+        await Products.create(req.body)
+        res.send({ message: 'Product added successfully!' })
+    } catch (error) {
+        res.send({ message: error.message })
+    }
 })
 
 router.put('/update',(req,res)=>{
