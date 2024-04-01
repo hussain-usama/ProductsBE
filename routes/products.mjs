@@ -32,6 +32,10 @@ router.put('/update', async (req, res) => {
             { $set: { title, amount, description } },
             { new: true }
         );
+        if(!updatedProduct){
+            res.send({ message: 'Record not found!',data: updatedProduct });
+            return;
+        }
         res.send({ message: 'Record updated successfully!',data: updatedProduct });
     } catch (error) {
         res.send({ message: error.message })
@@ -50,6 +54,16 @@ router.delete('/delete/:_id', async(req, res) => {
         res.send({ message: 'Record deleted successfully!' })
     } catch (error) {
         res.send({ message: 'Record not deleted!' })
+    }
+})
+
+router.delete('/deleteAll', async(req, res) => {
+    // start db operations
+    try {
+        await Products.deleteMany({})
+        res.send({ message: 'All Records deleted successfully!' })
+    } catch (error) {
+        res.send({ message: error.message })
     }
 })
 
