@@ -1,25 +1,48 @@
 import express from 'express'
+import AuthUsers from '../modals/users.mjs'
 
 const router=express.Router()
 
-router.get('/',(req,res)=>{
+router.get('/',async(req,res)=>{
     // start db operations
-    res.send({message:'Response receive successfully!'})
+    try {
+        const allUsers =await AuthUsers.find()
+        res.send({message:'Users fetched successfully!', data:allUsers})
+    } catch (error) {
+        res.send({message:error.message})
+    }
 })
 
-router.post('/add',(req,res)=>{
+router.post('/register',async(req,res)=>{
     // start db operations
-    res.send({message:'Record added successfully!'})
+   try {
+     const newUser = await AuthUsers.create(req.body)
+     res.send({message:'Registered successfully!' , data: {email: newUser.email, username: newUser.username}})
+   } catch (error) {
+      res.send({message:error.message})
+   }
 })
 
-router.put('/update',(req,res)=>{
+
+router.post('/login',async(req,res)=>{
     // start db operations
-    res.send({message:'Record updated successfully!'})
+    try {
+        const {email, password} =req.body
+        const findUser =await AuthUsers.findOne({email})
+        if(!findUser){
+            res.send({message:'User not found!'})
+            return 
+        }
+        const validateUser = findUser.comparePassword(password)
+        if(!validateUser){
+            res.send({message:'Incorrect password!'})
+            return
+        }
+        res.send({message:'Logged in successfully!'})
+    } catch (error) {
+        res.send({message:error.message})
+    }
 })
 
-router.delete('/delete',(req,res)=>{
-    // start db operations
-    res.send({message:'Record deleted successfully!'})
-})
 
 export default router
