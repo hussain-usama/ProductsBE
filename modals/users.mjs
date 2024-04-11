@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import jwtSecret from "../config/jwt.mjs";
 
 const {Schema} = mongoose
 
@@ -34,6 +36,13 @@ usersSchema.pre('save',function(next){
 usersSchema.methods.comparePassword = function(password){ 
     const user = this
     return bcrypt.compareSync(password, user.password)
+}
+
+/* Generate Token on Login*/
+usersSchema.methods.generateToken = function(){
+    const user = this
+    const token = jwt.sign({ _id: user?._id }, jwtSecret);
+    return token;
 }
 const AuthUsers=mongoose.model('users',usersSchema)
 

@@ -16,6 +16,13 @@ router.get('/',async(req,res)=>{
 router.post('/register',async(req,res)=>{
     // start db operations
    try {
+    const {email} =req.body
+    const findUser =await AuthUsers.findOne({email})
+    if(findUser?.email){
+        res.send({message: 'Email already registered!' })
+        return
+    }
+  
      const newUser = await AuthUsers.create(req.body)
      res.send({message:'Registered successfully!' , data: {email: newUser.email, username: newUser.username}})
    } catch (error) {
@@ -38,7 +45,8 @@ router.post('/login',async(req,res)=>{
             res.send({message:'Incorrect password!'})
             return
         }
-        res.send({message:'Logged in successfully!'})
+        const token = findUser.generateToken()
+        res.send({message:'Logged in successfully!', token})
     } catch (error) {
         res.send({message:error.message})
     }

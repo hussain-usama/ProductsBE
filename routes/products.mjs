@@ -1,5 +1,6 @@
 import express from 'express'
 import Products from '../modals/products.mjs'
+import verifyToken from '../middlewares/verifyToken.mjs'
 
 const router = express.Router()
 
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.post('/add', async (req, res) => {
+router.post('/add',verifyToken, async (req, res) => {
     try {
         // start db operations
         await Products.create(req.body)
@@ -23,7 +24,7 @@ router.post('/add', async (req, res) => {
     }
 })
 
-router.put('/update', async (req, res) => {
+router.put('/update',verifyToken, async (req, res) => {
     // start db operations
     try {
         const { _id, title, amount, description } = req.body;
@@ -42,7 +43,7 @@ router.put('/update', async (req, res) => {
     }
 })
 
-router.delete('/delete/:_id', async(req, res) => {
+router.delete('/delete/:_id',verifyToken, async(req, res) => {
     // start db operations
     try {
         const { _id } = req.params;
@@ -57,7 +58,7 @@ router.delete('/delete/:_id', async(req, res) => {
     }
 })
 
-router.delete('/deleteAll', async(req, res) => {
+router.delete('/deleteAll',verifyToken, async(req, res) => {
     // start db operations
     try {
         await Products.deleteMany({})
