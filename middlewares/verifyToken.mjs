@@ -7,7 +7,7 @@ function verifyToken(req,res,next){
         jwt.verify(token, jwtSecret)
         next()
     } catch (error) {
-        res.send({ message: "Invalid Token" })
+        res.send({ message: error.message })
     }
 }
 export default verifyToken
