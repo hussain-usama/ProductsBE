@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 router.post('/add',verifyToken, async (req, res) => {
     try {
         // start db operations
-        await Products.create(req.body)
+        await Products.create(req.body)              //Products.create(req.body) TO INSERT MULTIPLE RECORDS. NEED TO PASS ARRAY OF OBJECT FROM FE
         res.send({ message: 'Product added successfully!' })
     } catch (error) {
         res.send({ message: error.message })
@@ -27,11 +27,11 @@ router.post('/add',verifyToken, async (req, res) => {
 router.put('/update',verifyToken, async (req, res) => {
     // start db operations
     try {
-        const { _id, title, amount, description } = req.body;
-        let updatedProduct= await Products.findOneAndUpdate(
-            { _id },
-            { $set: { title, amount, description } },
-            { new: true }
+         const { _id, title, amount, description } = req.body;                    // THIS METHOD IS TO UPDATE ULTIPLE RECORDS EX THOSE RECORDS THAT HAVE TITLE 'Realme note 50' THOSE ALL WILL BE UPDATED 
+        let updatedProduct= await Products.findOneAndUpdate(                       // let updatedProduct= await Products.updateMany(
+            { _id },                                                               // { title: "Realme note 50" },
+            { $set: { title, amount, description } },                              // { $set: { title, amount, description } },
+            { new: true }                                                          //  { new: true }
         );
         if(!updatedProduct){
             res.send({ message: 'Record not found!',data: updatedProduct });
@@ -61,7 +61,7 @@ router.delete('/delete/:_id',verifyToken, async(req, res) => {
 router.delete('/deleteAll',verifyToken, async(req, res) => {
     // start db operations
     try {
-        await Products.deleteMany({})
+        await Products.deleteMany({})                               // Products.deleteMany(req.body) IT WILL DELETE MULTIPLE SPECIFIC RECORDS EX+> IF req.body={amount:1000} THEN IT WILL DELETE ALL RECORDS THAT HAVE AMOUNT EQUALS TO 1000
         res.send({ message: 'All Records deleted successfully!' })
     } catch (error) {
         res.send({ message: error.message })

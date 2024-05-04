@@ -41,7 +41,7 @@ usersSchema.methods.comparePassword = function(password){
 /* Generate Token on Login*/
 usersSchema.methods.generateToken = function(){
     const user = this
-    const token = jwt.sign({ _id: user?._id }, jwtSecret,{ expiresIn: 30 }); 
+    const token = jwt.sign({ _id: user?._id }, jwtSecret,{ expiresIn: '1d' }); 
     /* A numeric value of expiresIn is considered as a seconds count. If you use a string be
      sure you provide the time units (days, hours, etc),Eg: "2 days", "10h", "7d". otherwise milliseconds unit 
      is used by default ("120" is equal to "120ms" */
