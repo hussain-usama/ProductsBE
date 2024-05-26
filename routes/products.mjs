@@ -68,4 +68,20 @@ router.delete('/deleteAll',verifyToken, async(req, res) => {
     }
 })
 
+
+router.get('/search/:key',verifyToken, async(req, res) => {
+    // start db operations
+    try {
+        const searchKey=req.params.key;
+        const data = await Products.find(
+                { "title": { $regex:searchKey, $options: 'i' } } // $options: 'i'  is added to prevent from case sensitiveness
+                // { "desc": { $regex:searchKey, $options: 'i' } } we can add search on multiple fields / keys by just adding more options
+        )                             
+        res.send({ data })
+    } catch (error) {
+        res.send({ message: error.message })
+    }
+})
+
+
 export default router
