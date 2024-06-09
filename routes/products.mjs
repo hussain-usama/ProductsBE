@@ -1,7 +1,20 @@
 import express from 'express'
 import Products from '../modals/products.mjs'
 import verifyToken from '../middlewares/verifyToken.mjs'
+import multer from 'multer'
 
+/* file upload using multer */
+const storage=multer.diskStorage({
+    destination:(req,file,cb)=>{
+        cb(null,'filesUpload')
+    },
+    filename:(req,file,cb)=>{
+        const fileExtension= file.mimetype.split('/')[1]
+        cb(null,file.fieldname + '_' + Date.now() + '.' + fileExtension )
+    }
+})
+const upload=multer({ storage: storage}).single('file')
+/* file upload ising multer */
 const router = express.Router()
 
 router.get('/', async (req, res) => {
@@ -78,6 +91,15 @@ router.get('/search/:key',verifyToken, async(req, res) => {
                 // { "desc": { $regex:searchKey, $options: 'i' } } we can add search on multiple fields / keys by just adding more options
         )                             
         res.send({ data })
+    } catch (error) {
+        res.send({ message: error.message })
+    }
+})
+
+router.post('/upload',upload, async(req, res) => {
+    // start db operations
+    try {                           
+        res.send({message:'file upload successfully!' })
     } catch (error) {
         res.send({ message: error.message })
     }
