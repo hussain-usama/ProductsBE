@@ -1,25 +1,25 @@
 import express from 'express'
 import Products from '../modals/products.mjs'
 import verifyToken from '../middlewares/verifyToken.mjs'
-import multer from 'multer'
-
-/* file upload using multer */
-const storage=multer.diskStorage({
-    destination:(req,file,cb)=>{
-        cb(null,'filesUpload')
-    },
-    filename:(req,file,cb)=>{
-        const fileExtension= file.mimetype.split('/')[1]
-        cb(null,file.fieldname + '_' + Date.now() + '.' + fileExtension )
-    }
-})
-const upload=multer({ storage: storage}).single('file')
-/* file upload ising multer */
+import { uploadOnFolder } from '../middlewares/uploadFiles.mjs'
+import EventEmitter from 'events' // name EventEmitter should be first letter uppercase whenever we import events b/c events are class
 const router = express.Router()
+const event = new EventEmitter();
+
+let count=0
+event.on('allProducts',()=>{ // takes 2 parameters first on should be event name that we call for event.emit function
+    count++
+    console.log('event called',count);
+})
+/* this is basic example of events use case would be if user hit login api 5 times with wrong credentials then we can stop 
+   stop the user to hit more time and wait them for 5 min by sending some message from backend . We can store count value
+   in database so when user refereshes page warning still shows to them
+*/
 
 router.get('/', async (req, res) => {
     try {
         // start db operations
+        event.emit('allProducts');
         const getProducts = await Products.find()
         res.send({ message: 'Products Fetched Successfully!', data: getProducts })
     } catch (error) {
@@ -96,7 +96,7 @@ router.get('/search/:key',verifyToken, async(req, res) => {
     }
 })
 
-router.post('/upload',upload, async(req, res) => {
+router.post('/upload',uploadOnFolder, async(req, res) => {
     // start db operations
     try {                           
         res.send({message:'file upload successfully!' })
