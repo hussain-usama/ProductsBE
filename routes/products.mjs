@@ -3,6 +3,8 @@ import Products from '../modals/products.mjs'
 import verifyToken from '../middlewares/verifyToken.mjs'
 import { uploadOnFolder } from '../middlewares/uploadFiles.mjs'
 import EventEmitter from 'events' // name EventEmitter should be first letter uppercase whenever we import events b/c events are class
+import FilesUpload from '../modals/files.mjs'
+import { getAllDbFiles, gridfsUpload, uploadToGridFS } from '../middlewares/uploadFilesTodb.mjs'
 const router = express.Router()
 const event = new EventEmitter();
 
@@ -98,12 +100,43 @@ router.get('/search/:key',verifyToken, async(req, res) => {
 
 router.post('/upload',uploadOnFolder, async(req, res) => {
     // start db operations
-    try {                           
+    try {     
+        console.log(req.file,'<=== file')                      
+        console.log(req.body,'<=== body')     
+        const uploadData={
+            path:req.file.path,
+            originalName:req.file.originalname
+        }    
+        const upload = await FilesUpload.create(uploadData)             
         res.send({message:'file upload successfully!' })
     } catch (error) {
         res.send({ message: error.message })
     }
 })
 
+/* upload to database using gridfs */
+router.post('/uploadToDB', gridfsUpload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        throw new Error('No file uploaded'); // Handle missing file
+      }
+      const fileId = await uploadToGridFS(req.file, req.body); // Access additional data from req.body
+      res.send({ message: 'File uploaded successfully!', fileId });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: 'Error uploading file' });
+    }
+  });
+
+  /* get all files */
+  router.get('/dbFiles', async (req, res) => {
+    try {
+      const files = await getAllDbFiles();
+      res.send(files);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: 'Error fetching files' });
+    }
+  });
 
 export default router
