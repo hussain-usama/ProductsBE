@@ -1,11 +1,13 @@
 import { MongoClient, GridFSBucket } from 'mongodb'
 import stream from 'stream'
 import multer from 'multer'
+import dotenv from 'dotenv'
+dotenv.config();
 
 const storage = multer.memoryStorage();
 export const gridfsUpload = multer({ storage });
 
-const uri = "mongodb+srv://usamaahussain23:usamahussain28@cluster0.yh7k6pu.mongodb.net/Olx";
+const uri = process.env.REACT_APP_DB_URI;
 const dbName = "files";
 const collectionName = "uploads"; // GridFS collection name
 
